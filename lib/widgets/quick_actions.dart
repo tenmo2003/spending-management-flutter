@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class QuickActions extends StatelessWidget {
   final List<String> categories;
 
-  const QuickActions({Key? key, required this.categories}) : super(key: key);
+  const QuickActions({super.key, required this.categories});
 
   @override
   Widget build(BuildContext context) {

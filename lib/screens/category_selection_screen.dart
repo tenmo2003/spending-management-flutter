@@ -3,7 +3,7 @@ import '../screens/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CategorySelectionScreen extends StatefulWidget {
-  const CategorySelectionScreen({Key? key}) : super(key: key);
+  const CategorySelectionScreen({super.key});
 
   @override
   _CategorySelectionScreenState createState() =>
@@ -69,6 +69,7 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen> {
                         final isSelected =
                             selectedCategories.contains(category['name']);
                         return FilterChip(
+                          showCheckmark: false,
                           label: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
