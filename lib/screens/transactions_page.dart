@@ -11,7 +11,8 @@ class TransactionsPage extends StatefulWidget {
   _TransactionsPageState createState() => _TransactionsPageState();
 }
 
-class _TransactionsPageState extends State<TransactionsPage> with AutomaticKeepAliveClientMixin {
+class _TransactionsPageState extends State<TransactionsPage>
+    with AutomaticKeepAliveClientMixin {
   final transactionDao = TransactionDao.instance;
   List<Transaction> _transactions = [];
   bool _isLoading = true;
@@ -29,7 +30,8 @@ class _TransactionsPageState extends State<TransactionsPage> with AutomaticKeepA
 
   Future<void> _loadTransactions() async {
     try {
-      final transactions = await transactionDao.getAllTransactions(type: _selectedType);
+      final transactions =
+          await transactionDao.getAllTransactions(type: _selectedType);
       if (mounted) {
         setState(() {
           _transactions = transactions;
@@ -48,8 +50,10 @@ class _TransactionsPageState extends State<TransactionsPage> with AutomaticKeepA
 
   void _showEditTransactionDialog(Transaction transaction) {
     final nameController = TextEditingController(text: transaction.name);
-    final amountController = TextEditingController(text: transaction.amount.toString());
-    final categoryController = TextEditingController(text: transaction.category);
+    final amountController =
+        TextEditingController(text: transaction.amount.toString());
+    final categoryController =
+        TextEditingController(text: transaction.category);
 
     showDialog(
       context: context,
@@ -147,7 +151,7 @@ class _TransactionsPageState extends State<TransactionsPage> with AutomaticKeepA
                 // Proceed with deletion if confirmed
                 if (confirmDelete == true) {
                   await transactionDao.deleteTransaction(transaction.id);
-                  
+
                   // Refresh transactions
                   await _loadTransactions();
 
@@ -180,9 +184,9 @@ class _TransactionsPageState extends State<TransactionsPage> with AutomaticKeepA
                 ],
                 onPressed: (index) {
                   setState(() {
-                    _selectedType = index == 0 
-                      ? TransactionType.expense 
-                      : TransactionType.income;
+                    _selectedType = index == 0
+                        ? TransactionType.expense
+                        : TransactionType.income;
                     _loadTransactions();
                   });
                 },
@@ -212,7 +216,7 @@ class _TransactionsPageState extends State<TransactionsPage> with AutomaticKeepA
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _transactions.isEmpty
-              ? const Center(child: Text('No transactions found'))
+              ? const Center(child: Text('No transactions have been made'))
               : Scrollbar(
                   controller: _scrollController,
                   child: ListView.builder(
@@ -231,9 +235,9 @@ class _TransactionsPageState extends State<TransactionsPage> with AutomaticKeepA
                         trailing: Text(
                           sprintf('\$%.2f', [transaction.amount]),
                           style: TextStyle(
-                            color: transaction.type == TransactionType.expense 
-                              ? Colors.red 
-                              : Colors.green,
+                            color: transaction.type == TransactionType.expense
+                                ? Colors.red
+                                : Colors.green,
                           ),
                         ),
                         onTap: () => _showEditTransactionDialog(transaction),

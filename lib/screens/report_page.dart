@@ -95,7 +95,7 @@ class _ReportPageState extends State<ReportPage>
     final List<FlSpot> chartPoints = monthlyData.asMap().entries.map((entry) {
       final index = entry.key;
       final data = entry.value;
-      return FlSpot(index.toDouble(), (data['total_amount'] as num).toDouble());
+      return FlSpot(index.toDouble(), (data['total'] as num).toDouble());
     }).toList();
 
     return AspectRatio(
@@ -144,14 +144,14 @@ class _ReportPageState extends State<ReportPage>
   Widget _buildPieChart(List<Map<String, dynamic>> pieData) {
     // Calculate total for percentage
     final total = pieData.fold(
-        0.0, (sum, item) => sum + (item['total_amount'] as num).toDouble());
+        0.0, (sum, item) => sum + (item['total'] as num).toDouble());
 
     return AspectRatio(
       aspectRatio: 1.5,
       child: PieChart(
         PieChartData(
           sections: pieData.map((item) {
-            final amount = (item['total_amount'] as num).toDouble();
+            final amount = (item['total'] as num).toDouble();
             final percentage = (amount / total) * 100;
             return PieChartSectionData(
               color: _getColorForCategory(item['category']),

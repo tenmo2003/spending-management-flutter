@@ -142,14 +142,13 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
               final name = nameController.text;
               final amount = double.parse(amountController.text);
               final expenseDao = TransactionDao.instance;
-              final transaction = await expenseDao.addTransaction(
-                name: name,
-                amount: amount,
-                category: selectedCategory,
-                date: DateTime.now(),
-                type: model.TransactionType.expense
-              );
-              widget.onExpenseAdded(transaction);
+              await expenseDao.addTransaction(
+                  name: name,
+                  amount: amount,
+                  category: selectedCategory,
+                  date: DateTime.now(),
+                  type: model.TransactionType.expense);
+              widget.onExpenseAdded();
               Navigator.of(context).pop();
             }
           },
