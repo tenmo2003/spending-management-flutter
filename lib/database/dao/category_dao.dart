@@ -1,26 +1,84 @@
-import 'package:sqflite/sqflite.dart';
 import '../database_helper.dart';
+import 'package:spending_management_app/model/transaction.dart' as model;
+import 'package:spending_management_app/model/category_spending.dart';
 
 class CategoryDao {
+  static final CategoryDao instance = CategoryDao._init();
   final DatabaseHelper _databaseHelper = DatabaseHelper.instance;
 
-  Future<int> insertCategory(String name) async {
+  CategoryDao._init();
+
+  Future<int> addCategory(String name, model.TransactionType type) async {
     final db = await _databaseHelper.database;
-    return await db.insert('categories', {'name': name}, conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert('categories', {'name': name, 'type': type.index});
   }
 
-  Future<List<Map<String, dynamic>>> getCategories() async {
+  Future<bool> addCategories(
+      List<String> names, model.TransactionType type) async {
     final db = await _databaseHelper.database;
-    return await db.query('categories');
+    try {
+      await db.transaction((txn) async {
+        final batch = txn.batch();
+        for (String name in names) {
+          batch.insert('categories', {'name': name, 'type': type.index});
+        }
+        await batch.commit();
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  Future<int> deleteCategory(String name) async {
+  Future<List<String>> getCategoriesByType(model.TransactionType type) async {
     final db = await _databaseHelper.database;
-    return await db.delete('categories', where: 'name = ?', whereArgs: [name]);
+    List<Map<String, dynamic>> categories = await db
+        .query('categories', where: 'type = ?', whereArgs: [type.index]);
+    return categories.map((e) => e['name'] as String).toList();
   }
 
-  Future<int> updateCategory(String oldName, String newName) async {
+  Future<int> deleteCategory(String name, model.TransactionType type) async {
     final db = await _databaseHelper.database;
-    return await db.update('categories', {'name': newName}, where: 'name = ?', whereArgs: [oldName]);
+    return await db.delete('categories',
+        where: 'name = ? AND type = ?', whereArgs: [name, type.index]);
+  }
+
+  Future<int> updateCategory(
+      String oldName, String newName, model.TransactionType type) async {
+    final db = await _databaseHelper.database;
+    return await db.update('categories', {'name': newName},
+        where: 'name = ? AND type = ?', whereArgs: [oldName, type.index]);
+  }
+
+  Future<List<CategorySpending>> getTopNCategories(
+      int n, model.TransactionType type) async {
+    final db = await _databaseHelper.database;
+    return await db.rawQuery('''
+      SELECT category, SUM(amount) AS total_amount
+      FROM transactions
+      WHERE type = ?
+      GROUP BY category
+      ORDER BY total_amount DESC
+      LIMIT ?
+    ''', [
+      type.index,
+      n
+    ]).then((value) => value
+        .map((e) => CategorySpending(
+            category: e['category'] as String,
+            amount: e['total_amount'] as double))
+        .toList());
+  }
+
+  Future<List<Map<String, dynamic>>> getCategoryPieData(
+      model.TransactionType type) async {
+    final db = await _databaseHelper.database;
+    return await db.rawQuery('''
+      SELECT category, SUM(amount) as total
+      FROM transactions
+      WHERE type = ?
+      GROUP BY category
+      ORDER BY total DESC
+    ''', [type.index]);
   }
 }

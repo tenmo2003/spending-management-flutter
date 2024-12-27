@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spending_management_app/screens/home_page.dart';
+import 'package:spending_management_app/screens/main_navigation_page.dart';
 import 'screens/category_selection_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,9 +49,9 @@ class _FirstTimeCheckState extends State<FirstTimeCheck> {
               builder: (context) => const CategorySelectionScreen()),
         );
       } else {
-        // Returning user, show home page
+        // Returning user, show main navigation page
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const MainNavigationPage()),
         );
       }
     }

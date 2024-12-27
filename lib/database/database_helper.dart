@@ -1,5 +1,5 @@
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -17,25 +17,29 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
-  Future<void> _createDB(Database db, int version) async {
+  Future<void> _onCreate(Database db, int version) async {
+    // Create categories table
     await db.execute('''
-    CREATE TABLE categories(
-      name TEXT PRIMARY KEY
-    )
-  ''');
+      CREATE TABLE categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        type INTEGER NOT NULL
+      )
+    ''');
 
+    // Create transactions table
     await db.execute('''
-    CREATE TABLE expenses(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      amount REAL NOT NULL,
-      category TEXT NOT NULL,
-      date TEXT NOT NULL,
-      FOREIGN KEY (category) REFERENCES categories (name)
-    )
-  ''');
+      CREATE TABLE transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        amount REAL NOT NULL,
+        date TEXT NOT NULL,
+        type INTEGER NOT NULL
+      )
+    ''');
   }
 }
