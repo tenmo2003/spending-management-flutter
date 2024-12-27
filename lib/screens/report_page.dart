@@ -1,18 +1,20 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spending_management_app/database/dao/category_dao.dart';
 import 'package:spending_management_app/database/dao/transaction_dao.dart';
 import 'package:spending_management_app/model/category_spending.dart';
 import 'package:spending_management_app/model/transaction.dart';
+import 'package:spending_management_app/providers/currency_provider.dart';
 
-class ReportPage extends StatefulWidget {
+class ReportPage extends ConsumerStatefulWidget {
   const ReportPage({super.key});
 
   @override
-  _ReportPageState createState() => _ReportPageState();
+  ConsumerState<ReportPage> createState() => _ReportPageState();
 }
 
-class _ReportPageState extends State<ReportPage>
+class _ReportPageState extends ConsumerState<ReportPage>
     with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   final transactionDao = TransactionDao.instance;
   final categoryDao = CategoryDao.instance;
@@ -223,7 +225,7 @@ class _ReportPageState extends State<ReportPage>
                                       const Text('Total Expenses',
                                           style: TextStyle(fontSize: 16)),
                                       Text(
-                                          '\$${_totalExpenses.toStringAsFixed(2)}',
+                                          ref.watch(formattedAmountProvider(_totalExpenses)),
                                           style: const TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold,
@@ -256,11 +258,9 @@ class _ReportPageState extends State<ReportPage>
                                 child: ListTile(
                                   title: Text(category.category),
                                   trailing: Text(
-                                    '\$${category.amount.toStringAsFixed(2)}',
+                                    ref.watch(formattedAmountProvider(category.amount)),
                                     style: const TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               )),
@@ -303,7 +303,7 @@ class _ReportPageState extends State<ReportPage>
                                       const Text('Total Income',
                                           style: TextStyle(fontSize: 16)),
                                       Text(
-                                          '\$${_totalIncome.toStringAsFixed(2)}',
+                                          ref.watch(formattedAmountProvider(_totalIncome)),
                                           style: const TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold,
@@ -336,11 +336,9 @@ class _ReportPageState extends State<ReportPage>
                                 child: ListTile(
                                   title: Text(category.category),
                                   trailing: Text(
-                                    '\$${category.amount.toStringAsFixed(2)}',
+                                    ref.watch(formattedAmountProvider(category.amount)),
                                     style: const TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               )),

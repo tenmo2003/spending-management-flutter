@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spending_management_app/database/dao/transaction_dao.dart';
 import 'package:spending_management_app/model/transaction.dart';
-import 'package:sprintf/sprintf.dart';
+import 'package:spending_management_app/providers/currency_provider.dart';
 import 'package:intl/intl.dart';
 
-class TransactionsPage extends StatefulWidget {
+class TransactionsPage extends ConsumerStatefulWidget {
   const TransactionsPage({super.key});
 
   @override
-  _TransactionsPageState createState() => _TransactionsPageState();
+  ConsumerState<TransactionsPage> createState() => _TransactionsPageState();
 }
 
-class _TransactionsPageState extends State<TransactionsPage>
+class _TransactionsPageState extends ConsumerState<TransactionsPage>
     with AutomaticKeepAliveClientMixin {
   final transactionDao = TransactionDao.instance;
   List<Transaction> _transactions = [];
@@ -233,7 +234,7 @@ class _TransactionsPageState extends State<TransactionsPage>
                           '${transaction.category} • ${DateFormat('dd MMM yyyy').format(transaction.date)}',
                         ),
                         trailing: Text(
-                          sprintf('\$%.2f', [transaction.amount]),
+                          ref.watch(formattedAmountProvider(transaction.amount)),
                           style: TextStyle(
                             color: transaction.type == TransactionType.expense
                                 ? Colors.red

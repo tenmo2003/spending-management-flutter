@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:spending_management_app/screens/main_navigation_page.dart';
-import 'screens/category_selection_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spending_management_app/screens/main_navigation_page.dart';
+
+import 'screens/category_selection_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

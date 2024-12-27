@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spending_management_app/model/category_spending.dart';
-import 'package:sprintf/sprintf.dart';
+import 'package:spending_management_app/providers/currency_provider.dart';
 
-class SummaryCard extends StatelessWidget {
+class SummaryCard extends ConsumerWidget {
   final double totalSpent;
   final List<CategorySpending> topCategories;
 
@@ -10,7 +11,7 @@ class SummaryCard extends StatelessWidget {
       {super.key, required this.topCategories, required this.totalSpent});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
         width: double.infinity,
         child: Card(
@@ -26,7 +27,7 @@ class SummaryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  sprintf('\$%.2f', [totalSpent]),
+                  ref.watch(formattedAmountProvider(totalSpent)),
                   style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
@@ -35,7 +36,7 @@ class SummaryCard extends StatelessWidget {
                   children: topCategories
                       .map((category) => Expanded(
                           child: _buildCategorySpending(
-                              category.category, category.amount)))
+                              category.category, category.amount, ref)))
                       .toList(),
                 ),
               ],
@@ -44,7 +45,7 @@ class SummaryCard extends StatelessWidget {
         ));
   }
 
-  Widget _buildCategorySpending(String category, double amount) {
+  Widget _buildCategorySpending(String category, double amount, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -60,7 +61,7 @@ class SummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '\$${amount.toStringAsFixed(2)}',
+            ref.watch(formattedAmountProvider(amount)),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
