@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:spending_management_app/database/dao/transaction_dao.dart';
-import 'package:spending_management_app/model/transaction.dart' as model;
+import 'package:spending_management_app/model/category.dart';
 
 class QuickActions extends StatelessWidget {
-  final List<String> categories;
+  final List<Category> categories;
   final Function onExpenseAdded;
 
   const QuickActions(
@@ -24,7 +24,8 @@ class QuickActions extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildQuickActionButton(context, Icons.receipt, 'Add Expense'),
+              _buildQuickActionButton(
+                  context, Icons.receipt, 'Add Transaction'),
               _buildQuickActionButton(context, Icons.bar_chart, 'View Reports'),
               _buildQuickActionButton(context, Icons.category, 'Categories'),
             ],
@@ -40,8 +41,8 @@ class QuickActions extends StatelessWidget {
       children: [
         ElevatedButton(
           onPressed: () {
-            if (label == 'Add Expense') {
-              _showAddExpenseDialog(context);
+            if (label == 'Add Transaction') {
+              _showAddTransactionDialog(context);
             } else {
               // TODO: Implement other actions
             }
@@ -58,30 +59,30 @@ class QuickActions extends StatelessWidget {
     );
   }
 
-  void _showAddExpenseDialog(BuildContext context) {
+  void _showAddTransactionDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AddExpenseDialog(
-            categories: categories, onExpenseAdded: onExpenseAdded);
+        return AddTransactionDialog(
+            categories: categories, onTransactionAdded: onExpenseAdded);
       },
     );
   }
 }
 
-class AddExpenseDialog extends StatefulWidget {
-  final List<String> categories;
-  final Function onExpenseAdded;
+class AddTransactionDialog extends StatefulWidget {
+  final List<Category> categories;
+  final Function onTransactionAdded;
 
-  const AddExpenseDialog(
-      {super.key, required this.categories, required this.onExpenseAdded});
+  const AddTransactionDialog(
+      {super.key, required this.categories, required this.onTransactionAdded});
 
   @override
-  _AddExpenseDialogState createState() => _AddExpenseDialogState();
+  _AddTransactionDialogState createState() => _AddTransactionDialogState();
 }
 
-class _AddExpenseDialogState extends State<AddExpenseDialog> {
-  late String selectedCategory;
+class _AddTransactionDialogState extends State<AddTransactionDialog> {
+  late Category selectedCategory;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
 
@@ -94,13 +95,13 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add Expense'),
+      title: const Text('Add Transaction'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: nameController,
-            decoration: const InputDecoration(labelText: 'Expense Name'),
+            decoration: const InputDecoration(labelText: 'Transaction Name'),
           ),
           const SizedBox(height: 16),
           TextField(
@@ -110,17 +111,18 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
           ),
           const SizedBox(height: 16),
           DropdownButton<String>(
-            value: selectedCategory,
+            value: selectedCategory.name,
             items: widget.categories.map((category) {
               return DropdownMenuItem<String>(
-                value: category,
-                child: Text(category),
+                value: '${category.name} - ${category.type}',
+                child: Text(category.name),
               );
             }).toList(),
             onChanged: (String? newValue) {
               if (newValue != null) {
                 setState(() {
-                  selectedCategory = newValue;
+                  selectedCategory = widget.categories.firstWhere((category) =>
+                      '${category.name} - ${category.type}' == newValue);
                 });
               }
             },
@@ -141,14 +143,14 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
                 amountController.text.isNotEmpty) {
               final name = nameController.text;
               final amount = double.parse(amountController.text);
-              final expenseDao = TransactionDao.instance;
-              await expenseDao.addTransaction(
+              final transactionDao = TransactionDao.instance;
+              await transactionDao.addTransaction(
                   name: name,
                   amount: amount,
-                  category: selectedCategory,
+                  category: selectedCategory.name,
                   date: DateTime.now(),
-                  type: model.TransactionType.expense);
-              widget.onExpenseAdded();
+                  type: selectedCategory.type);
+              widget.onTransactionAdded();
               Navigator.of(context).pop();
             }
           },

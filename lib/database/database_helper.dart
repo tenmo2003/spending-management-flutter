@@ -17,16 +17,16 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _onCreate);
+    return await openDatabase(path, version: 2, onCreate: _onCreate, onUpgrade: _onUpgrade);
   }
 
   Future<void> _onCreate(Database db, int version) async {
     // Create categories table
     await db.execute('''
       CREATE TABLE categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        type INTEGER NOT NULL
+        type INTEGER NOT NULL,
+        PRIMARY KEY (name, type)
       )
     ''');
 
@@ -42,4 +42,18 @@ class DatabaseHelper {
       )
     ''');
   }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Drop tables and recreate
+      await db.execute('DROP TABLE categories');
+      await db.execute('DROP TABLE transactions');
+
+      // Recreate tables
+      await _onCreate(db, 2);
+    }
+  }
+
+
 }
+

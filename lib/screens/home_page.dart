@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:spending_management_app/database/dao/category_dao.dart';
 import 'package:spending_management_app/database/dao/transaction_dao.dart';
+import 'package:spending_management_app/model/category.dart';
 import 'package:spending_management_app/model/category_spending.dart';
 import 'package:spending_management_app/model/transaction.dart';
+import 'package:spending_management_app/notifiers/transaction_notifier.dart';
 import 'package:spending_management_app/widgets/quick_actions.dart';
 import 'package:spending_management_app/widgets/recent_transactions.dart';
 import 'package:spending_management_app/widgets/summary_card.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
+class _HomePageState extends ConsumerState<HomePage>
     with AutomaticKeepAliveClientMixin {
   List<Transaction> _recentTransactions = [];
   List<CategorySpending> topCategories = [];
-  List<String> categories = [];
+  List<Category> categories = [];
   double totalSpent = 0;
   bool _isLoading = true;
   bool _dataLoaded = false;
+
+  int lastUpdateTransaction = 0;
 
   static const numberOfTopCategories = 3;
   static const numberOfRecentTransaction = 5;
@@ -153,6 +158,13 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(transactionLastUpdateNotifierProvider, (previous, next) {
+      if (next > lastUpdateTransaction) {
+        lastUpdateTransaction = next;
+        _refreshData();
+      }
+    });
+
     super.build(context);
     return Scaffold(
       appBar: AppBar(
@@ -198,7 +210,13 @@ class _HomePageState extends State<HomePage>
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Implement add new transaction
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AddTransactionDialog(
+                  categories: categories, onTransactionAdded: _refreshData);
+            },
+          );
         },
         child: const Icon(Icons.add),
       ),

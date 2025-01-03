@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spending_management_app/database/dao/category_dao.dart';
 import 'package:spending_management_app/model/transaction.dart';
-import '../screens/home_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spending_management_app/screens/main_navigation_page.dart';
 
 class CategorySelectionScreen extends StatefulWidget {
   const CategorySelectionScreen({super.key});
@@ -284,13 +284,13 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen>
                                       // Mark first time setup as complete
                                       final prefs =
                                           await SharedPreferences.getInstance();
-                                      await prefs.setBool('first_time', false);
+                                      await prefs.setBool('isFirstTime', false);
 
                                       if (mounted) {
                                         Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                const HomePage(),
+                                                const MainNavigationPage(),
                                           ),
                                         );
                                       }

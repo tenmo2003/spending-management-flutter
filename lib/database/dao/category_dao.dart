@@ -1,3 +1,5 @@
+import 'package:spending_management_app/model/category.dart';
+
 import '../database_helper.dart';
 import 'package:spending_management_app/model/transaction.dart' as model;
 import 'package:spending_management_app/model/category_spending.dart';
@@ -30,11 +32,15 @@ class CategoryDao {
     }
   }
 
-  Future<List<String>> getCategoriesByType(model.TransactionType type) async {
+  Future<List<Category>> getCategoriesByType(model.TransactionType type) async {
     final db = await _databaseHelper.database;
     List<Map<String, dynamic>> categories = await db
         .query('categories', where: 'type = ?', whereArgs: [type.index]);
-    return categories.map((e) => e['name'] as String).toList();
+    return categories
+        .map((e) => Category(
+            name: e['name'] as String,
+            type: model.TransactionType.values[e['type'] as int]))
+        .toList();
   }
 
   Future<int> deleteCategory(String name, model.TransactionType type) async {
