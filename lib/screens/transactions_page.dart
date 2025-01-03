@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:spending_management_app/database/dao/transaction_dao.dart';
 import 'package:spending_management_app/model/transaction.dart';
-import 'package:spending_management_app/providers/currency_provider.dart';
-import 'package:intl/intl.dart';
+import 'package:spending_management_app/providers/category_notifier.dart';
+import 'package:spending_management_app/providers/currency_notifier.dart';
+import 'package:spending_management_app/providers/transaction_notifier.dart';
+import 'package:spending_management_app/widgets/add_transaction_dialog.dart';
 
 class TransactionsPage extends ConsumerStatefulWidget {
   const TransactionsPage({super.key});
@@ -12,16 +15,12 @@ class TransactionsPage extends ConsumerStatefulWidget {
   ConsumerState<TransactionsPage> createState() => _TransactionsPageState();
 }
 
-class _TransactionsPageState extends ConsumerState<TransactionsPage>
-    with AutomaticKeepAliveClientMixin {
+class _TransactionsPageState extends ConsumerState<TransactionsPage> {
   final transactionDao = TransactionDao.instance;
   List<Transaction> _transactions = [];
   bool _isLoading = true;
   final ScrollController _scrollController = ScrollController();
   TransactionType _selectedType = TransactionType.expense;
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -47,6 +46,12 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage>
         });
       }
     }
+  }
+
+  void _onTransactionAdded() async {
+    Future<void> loadTransactionFuture = _loadTransactions();
+    _updateTransactionNotifier();
+    await loadTransactionFuture;
   }
 
   void _showEditTransactionDialog(Transaction transaction) {
@@ -167,9 +172,14 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage>
     );
   }
 
+  void _updateTransactionNotifier() {
+    ref.read(transactionLastUpdateNotifierProvider.notifier).update();
+  }
+
   @override
   Widget build(BuildContext context) {
-    super.build(context);
+    final categories = ref.watch(categoryNotifierProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('All Transactions'),
@@ -234,7 +244,8 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage>
                           '${transaction.category} • ${DateFormat('dd MMM yyyy').format(transaction.date)}',
                         ),
                         trailing: Text(
-                          ref.watch(formattedAmountProvider(transaction.amount)),
+                          ref.watch(
+                              formattedAmountProvider(transaction.amount)),
                           style: TextStyle(
                             color: transaction.type == TransactionType.expense
                                 ? Colors.red
@@ -249,6 +260,14 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage>
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // TODO: Implement add new transaction
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AddTransactionDialog(
+                  categories: categories,
+                  onTransactionAdded: _onTransactionAdded);
+            },
+          );
         },
         child: const Icon(Icons.add),
       ),

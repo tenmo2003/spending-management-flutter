@@ -38,6 +38,7 @@ class TransactionDao {
     String? category,
     DateTime? startDate,
     DateTime? endDate,
+    int? limit,
   }) async {
     final db = await _databaseHelper.database;
 
@@ -71,6 +72,7 @@ class TransactionDao {
     final queryResult = await db.query('transactions',
         where: whereClause,
         whereArgs: whereArgs.isNotEmpty ? whereArgs : null,
+        limit: limit,
         orderBy: 'date DESC');
 
     return queryResult.map((e) => model.Transaction.fromMap(e)).toList();

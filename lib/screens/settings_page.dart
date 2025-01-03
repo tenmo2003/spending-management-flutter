@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:currency_picker/currency_picker.dart';
-import '../providers/currency_provider.dart';
+import '../providers/currency_notifier.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});

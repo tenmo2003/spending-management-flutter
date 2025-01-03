@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spending_management_app/model/category_spending.dart';
-import 'package:spending_management_app/providers/currency_provider.dart';
+import 'package:spending_management_app/providers/currency_notifier.dart';
 
 class SummaryCard extends ConsumerWidget {
   final double totalSpent;

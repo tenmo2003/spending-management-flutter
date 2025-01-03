@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:spending_management_app/database/dao/transaction_dao.dart';
 import 'package:spending_management_app/model/transaction.dart';
-import 'package:sprintf/sprintf.dart';
+import 'package:spending_management_app/providers/currency_notifier.dart';
 
-class RecentTransactions extends StatefulWidget {
+class RecentTransactions extends ConsumerStatefulWidget {
   final List<Transaction> recentTransactions;
   final VoidCallback onTransactionsChanged;
 
@@ -17,7 +18,7 @@ class RecentTransactions extends StatefulWidget {
   _RecentTransactionsState createState() => _RecentTransactionsState();
 }
 
-class _RecentTransactionsState extends State<RecentTransactions> {
+class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
   final transactionDao = TransactionDao.instance;
 
   void _showTransactionOptions(BuildContext context, Transaction transaction) {
@@ -179,7 +180,7 @@ class _RecentTransactionsState extends State<RecentTransactions> {
                         '${transaction.category} • ${DateFormat('dd MMM yyyy').format(transaction.date)}',
                       ),
                       trailing: Text(
-                        sprintf('\$%.2f', [transaction.amount]),
+                        ref.watch(formattedAmountProvider(transaction.amount)),
                         style: TextStyle(
                           color: transaction.type == TransactionType.expense
                               ? Colors.red

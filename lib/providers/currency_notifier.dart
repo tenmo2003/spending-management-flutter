@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:spending_management_app/helper/currency_helper.dart';
 
-part 'currency_provider.g.dart';
+part 'currency_notifier.g.dart';
 
 @riverpod
 class CurrencyNotifier extends _$CurrencyNotifier {

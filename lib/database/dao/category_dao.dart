@@ -32,10 +32,12 @@ class CategoryDao {
     }
   }
 
-  Future<List<Category>> getCategoriesByType(model.TransactionType type) async {
+  Future<List<Category>> getCategories(
+      {model.TransactionType? type}) async {
     final db = await _databaseHelper.database;
-    List<Map<String, dynamic>> categories = await db
-        .query('categories', where: 'type = ?', whereArgs: [type.index]);
+    List<Map<String, dynamic>> categories = await db.query('categories',
+        where: type != null ? 'type = ?' : null,
+        whereArgs: type != null ? [type.index] : null);
     return categories
         .map((e) => Category(
             name: e['name'] as String,

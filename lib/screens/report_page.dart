@@ -5,7 +5,7 @@ import 'package:spending_management_app/database/dao/category_dao.dart';
 import 'package:spending_management_app/database/dao/transaction_dao.dart';
 import 'package:spending_management_app/model/category_spending.dart';
 import 'package:spending_management_app/model/transaction.dart';
-import 'package:spending_management_app/providers/currency_provider.dart';
+import 'package:spending_management_app/providers/currency_notifier.dart';
 
 class ReportPage extends ConsumerStatefulWidget {
   const ReportPage({super.key});
@@ -15,7 +15,7 @@ class ReportPage extends ConsumerStatefulWidget {
 }
 
 class _ReportPageState extends ConsumerState<ReportPage>
-    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   final transactionDao = TransactionDao.instance;
   final categoryDao = CategoryDao.instance;
   List<CategorySpending> _topExpenseCategories = [];
@@ -29,9 +29,6 @@ class _ReportPageState extends ConsumerState<ReportPage>
   List<Map<String, dynamic>> _incomeMonthlyData = [];
   List<Map<String, dynamic>> _expensePieData = [];
   List<Map<String, dynamic>> _incomePieData = [];
-
-  @override
-  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -178,7 +175,6 @@ class _ReportPageState extends ConsumerState<ReportPage>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -225,7 +221,8 @@ class _ReportPageState extends ConsumerState<ReportPage>
                                       const Text('Total Expenses',
                                           style: TextStyle(fontSize: 16)),
                                       Text(
-                                          ref.watch(formattedAmountProvider(_totalExpenses)),
+                                          ref.watch(formattedAmountProvider(
+                                              _totalExpenses)),
                                           style: const TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold,
@@ -258,7 +255,8 @@ class _ReportPageState extends ConsumerState<ReportPage>
                                 child: ListTile(
                                   title: Text(category.category),
                                   trailing: Text(
-                                    ref.watch(formattedAmountProvider(category.amount)),
+                                    ref.watch(formattedAmountProvider(
+                                        category.amount)),
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -303,7 +301,8 @@ class _ReportPageState extends ConsumerState<ReportPage>
                                       const Text('Total Income',
                                           style: TextStyle(fontSize: 16)),
                                       Text(
-                                          ref.watch(formattedAmountProvider(_totalIncome)),
+                                          ref.watch(formattedAmountProvider(
+                                              _totalIncome)),
                                           style: const TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold,
@@ -336,7 +335,8 @@ class _ReportPageState extends ConsumerState<ReportPage>
                                 child: ListTile(
                                   title: Text(category.category),
                                   trailing: Text(
-                                    ref.watch(formattedAmountProvider(category.amount)),
+                                    ref.watch(formattedAmountProvider(
+                                        category.amount)),
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold),
                                   ),

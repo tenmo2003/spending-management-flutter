@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'currency_provider.dart';
+part of 'currency_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$formattedAmountHash() => r'c49cb1a03ef20927837d2e3cd973390ad2e53f39';
+String _$formattedAmountHash() => r'a76dea655bddbe78b8d8f14b93034b830e879cae';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -155,7 +155,7 @@ class _FormattedAmountProviderElement extends AutoDisposeProviderElement<String>
   double get amount => (origin as FormattedAmountProvider).amount;
 }
 
-String _$currencyNotifierHash() => r'2fc86f89171fd4ef866363872025ead8f7320f2c';
+String _$currencyNotifierHash() => r'32fdd39d5f4bf9b1a351b79ac972215680e0b622';
 
 /// See also [CurrencyNotifier].
 @ProviderFor(CurrencyNotifier)
