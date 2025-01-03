@@ -47,7 +47,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             items: widget.categories.map((category) {
               return DropdownMenuItem<String>(
                 value: '${category.name} - ${category.type.name}',
-                child: Text('${category.name} - ${category.type.name}'),
+                child: Text('${category.name} - ${category.type.getName()}'),
               );
             }).toList(),
             onChanged: (String? newValue) {

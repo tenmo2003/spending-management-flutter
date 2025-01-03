@@ -1,4 +1,13 @@
-enum TransactionType { expense, income }
+import 'package:spending_management_app/helper/string_extension.dart';
+
+enum TransactionType {
+  expense,
+  income;
+
+  String getName() {
+    return name.capitalize();
+  }
+}
 
 class Transaction {
   final int id;
