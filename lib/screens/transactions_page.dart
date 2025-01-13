@@ -259,12 +259,10 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Implement add new transaction
           showDialog(
             context: context,
             builder: (BuildContext context) {
               return AddTransactionDialog(
-                  categories: categories,
                   onTransactionAdded: _onTransactionAdded);
             },
           );

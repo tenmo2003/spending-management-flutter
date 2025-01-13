@@ -29,7 +29,7 @@ class _CategorySelectionScreenState extends State<CategorySelectionScreen>
     {'name': 'Salary', 'icon': Icons.account_balance_wallet},
     {'name': 'Bonus', 'icon': Icons.stars},
     {'name': 'Investment', 'icon': Icons.trending_up},
-    {'name': 'Gift', 'icon': Icons.redeem},
+    {'name': 'Gift', 'icon': Icons.card_giftcard},
   ];
 
   final Set<String> selectedExpenseCategories = {};

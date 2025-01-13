@@ -66,8 +66,8 @@ class TransactionDao {
       whereArgs.add(endDate.toIso8601String());
     }
 
-    String whereClause =
-        whereClauses.isNotEmpty ? whereClauses.join(' AND ') : '';
+    String? whereClause =
+        whereClauses.isNotEmpty ? whereClauses.join(' AND ') : null;
 
     final queryResult = await db.query('transactions',
         where: whereClause,
@@ -128,8 +128,7 @@ class TransactionDao {
       n
     ]).then((value) => value
         .map((e) => CategorySpending(
-            category: e['category'] as String,
-            amount: e['total_amount'] as double))
+            name: e['category'] as String, amount: e['total_amount'] as double))
         .toList());
   }
 

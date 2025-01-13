@@ -253,7 +253,7 @@ class _ReportPageState extends ConsumerState<ReportPage>
                                   ],
                                 ),
                                 child: ListTile(
-                                  title: Text(category.category),
+                                  title: Text(category.name),
                                   trailing: Text(
                                     ref.watch(formattedAmountProvider(
                                         category.amount)),
@@ -333,7 +333,7 @@ class _ReportPageState extends ConsumerState<ReportPage>
                                   ],
                                 ),
                                 child: ListTile(
-                                  title: Text(category.category),
+                                  title: Text(category.name),
                                   trailing: Text(
                                     ref.watch(formattedAmountProvider(
                                         category.amount)),

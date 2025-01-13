@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:spending_management_app/database/dao/transaction_dao.dart';
+import 'package:spending_management_app/helper/category_icon.dart';
 import 'package:spending_management_app/model/transaction.dart';
 import 'package:spending_management_app/providers/currency_notifier.dart';
 
@@ -173,14 +174,16 @@ class _RecentTransactionsState extends ConsumerState<RecentTransactions> {
                     final transaction = widget.recentTransactions[index];
                     return ListTile(
                       leading: CircleAvatar(
-                        child: Text(transaction.category[0].toUpperCase()),
+                        child: Icon(
+                            getIcon(transaction.category, transaction.type)),
                       ),
                       title: Text(transaction.name),
                       subtitle: Text(
                         '${transaction.category} • ${DateFormat('dd MMM yyyy').format(transaction.date)}',
                       ),
                       trailing: Text(
-                        ref.watch(formattedAmountProvider(transaction.amount)),
+                        ref.watch(
+                            formattedAmountProvider(transaction.getValue())),
                         style: TextStyle(
                           color: transaction.type == TransactionType.expense
                               ? Colors.red

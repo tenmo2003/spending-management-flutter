@@ -23,6 +23,8 @@ class _HomePageState extends ConsumerState<HomePage>
   List<Transaction> _recentTransactions = [];
   List<CategorySpending> topCategories = [];
   double totalSpent = 0;
+  double totalIncome = 0;
+  double balance = 0;
   bool _isLoading = true;
   bool _dataLoaded = false;
 
@@ -50,14 +52,14 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   Future<void> _loadData() async {
-    // Only load data if it hasn't been loaded before
+    // Only load data if it hasn't been loaded before or there are new updates
     if (_dataLoaded) return;
 
     try {
       await Future.wait([
         _loadRecentTransactions(),
         _loadTopCategories(),
-        _loadTotalSpent(),
+        _loadBalance(),
       ]);
 
       if (mounted) {
@@ -77,10 +79,7 @@ class _HomePageState extends ConsumerState<HomePage>
   }
 
   Future<void> _loadRecentTransactions() async {
-    final transactions = await transactionDao.getAllTransactions(
-      type: TransactionType.expense,
-      // Limit to last 5 recent transactions
-    );
+    final transactions = await transactionDao.getAllTransactions(limit: 5);
     setState(() {
       _recentTransactions =
           transactions.take(numberOfRecentTransaction).toList();
@@ -92,9 +91,14 @@ class _HomePageState extends ConsumerState<HomePage>
         numberOfTopCategories, TransactionType.expense);
   }
 
-  Future<void> _loadTotalSpent() async {
+  Future<void> _loadBalance() async {
     totalSpent =
         await transactionDao.getTotalAmount(type: TransactionType.expense);
+
+    totalIncome =
+        await transactionDao.getTotalAmount(type: TransactionType.income);
+
+    balance = totalIncome - totalSpent;
   }
 
   // Refresh method to be called when new expense is added
@@ -150,8 +154,6 @@ class _HomePageState extends ConsumerState<HomePage>
       }
     });
 
-    final categories = ref.watch(categoryNotifierProvider);
-
     super.build(context);
     return Scaffold(
       appBar: AppBar(
@@ -181,7 +183,9 @@ class _HomePageState extends ConsumerState<HomePage>
                 children: [
                   SummaryCard(
                     topCategories: topCategories,
-                    totalSpent: totalSpent,
+                    balance: balance,
+                    totalIncome: totalIncome,
+                    totalSpent: totalIncome,
                   ),
                   RecentTransactions(
                     recentTransactions: _recentTransactions,
@@ -195,8 +199,7 @@ class _HomePageState extends ConsumerState<HomePage>
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return AddTransactionDialog(
-                  categories: categories, onTransactionAdded: _refreshData);
+              return AddTransactionDialog(onTransactionAdded: _refreshData);
             },
           );
         },

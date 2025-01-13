@@ -73,7 +73,7 @@ class CategoryDao {
       n
     ]).then((value) => value
         .map((e) => CategorySpending(
-            category: e['category'] as String,
+            name: e['category'] as String,
             amount: e['total_amount'] as double))
         .toList());
   }

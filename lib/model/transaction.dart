@@ -49,4 +49,12 @@ class Transaction {
       type: TransactionType.values[map['type'] as int],
     );
   }
+
+  double getValue() {
+    if (type == TransactionType.expense) {
+      return -amount;
+    } else {
+      return amount;
+    }
+  }
 }
