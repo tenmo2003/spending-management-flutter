@@ -1,8 +1,8 @@
 import 'package:spending_management_app/model/category.dart';
+import 'package:spending_management_app/model/category_spending.dart';
+import 'package:spending_management_app/model/transaction.dart' as model;
 
 import '../database_helper.dart';
-import 'package:spending_management_app/model/transaction.dart' as model;
-import 'package:spending_management_app/model/category_spending.dart';
 
 class CategoryDao {
   static final CategoryDao instance = CategoryDao._init();
@@ -32,8 +32,7 @@ class CategoryDao {
     }
   }
 
-  Future<List<Category>> getCategories(
-      {model.TransactionType? type}) async {
+  Future<List<Category>> getCategories({model.TransactionType? type}) async {
     final db = await _databaseHelper.database;
     List<Map<String, dynamic>> categories = await db.query('categories',
         where: type != null ? 'type = ?' : null,
@@ -73,20 +72,28 @@ class CategoryDao {
       n
     ]).then((value) => value
         .map((e) => CategorySpending(
-            name: e['category'] as String,
+            categoryName: e['category'] as String,
             amount: e['total_amount'] as double))
         .toList());
   }
 
-  Future<List<Map<String, dynamic>>> getCategoryPieData(
+  Future<List<CategorySpending>> getCategoryPieData(
       model.TransactionType type) async {
     final db = await _databaseHelper.database;
-    return await db.rawQuery('''
+    List<Map<String, dynamic>> data = await db.rawQuery('''
       SELECT category, SUM(amount) as total
       FROM transactions
       WHERE type = ?
       GROUP BY category
       ORDER BY total DESC
     ''', [type.index]);
+
+    List<CategorySpending> result = [];
+    for (Map<String, dynamic> item in data) {
+      result.add(CategorySpending(
+          categoryName: item['category'] as String,
+          amount: item['total'] as double));
+    }
+    return result;
   }
 }

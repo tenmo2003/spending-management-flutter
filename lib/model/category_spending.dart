@@ -1,6 +1,6 @@
 class CategorySpending {
-  final String name;
+  final String categoryName;
   final double amount;
 
-  CategorySpending({required this.name, required this.amount});
+  CategorySpending({required this.categoryName, required this.amount});
 }

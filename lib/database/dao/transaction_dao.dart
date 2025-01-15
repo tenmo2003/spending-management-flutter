@@ -1,5 +1,6 @@
 import 'package:spending_management_app/database/database_helper.dart';
 import 'package:spending_management_app/model/category_spending.dart';
+import 'package:spending_management_app/model/monthly_category_spending.dart';
 import 'package:spending_management_app/model/transaction.dart' as model;
 
 class TransactionDao {
@@ -128,7 +129,8 @@ class TransactionDao {
       n
     ]).then((value) => value
         .map((e) => CategorySpending(
-            name: e['category'] as String, amount: e['total_amount'] as double))
+            categoryName: e['category'] as String,
+            amount: e['total_amount'] as double))
         .toList());
   }
 
@@ -143,10 +145,10 @@ class TransactionDao {
     return await db.delete('transactions', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<List<Map<String, dynamic>>> getMonthlyTransactions(
+  Future<List<MonthlySpending>> getMonthlyTransactions(
       model.TransactionType type) async {
     final db = await _databaseHelper.database;
-    return await db.rawQuery('''
+    List<Map<String, dynamic>> data = await db.rawQuery('''
       SELECT 
         strftime('%Y-%m', date) as month,
         SUM(amount) as total
@@ -155,5 +157,12 @@ class TransactionDao {
       GROUP BY strftime('%Y-%m', date)
       ORDER BY month DESC
     ''', [type.index]);
+
+    List<MonthlySpending> result = [];
+    for (Map<String, dynamic> item in data) {
+      result.add(MonthlySpending(
+          month: item['month'] as String, amount: item['total'] as double));
+    }
+    return result;
   }
 }

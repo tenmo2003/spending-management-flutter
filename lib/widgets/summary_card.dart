@@ -57,7 +57,7 @@ class SummaryCard extends ConsumerWidget {
                   children: topCategories
                       .map((category) => Expanded(
                           child: _buildCategorySpending(
-                              category: category.name,
+                              category: category.categoryName,
                               amount: category.amount,
                               ref: ref)))
                       .toList(),

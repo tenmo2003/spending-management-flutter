@@ -1,9 +1,11 @@
+import "dart:math" show pi;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spending_management_app/database/dao/category_dao.dart';
 import 'package:spending_management_app/database/dao/transaction_dao.dart';
 import 'package:spending_management_app/model/category_spending.dart';
+import 'package:spending_management_app/model/monthly_category_spending.dart';
 import 'package:spending_management_app/model/transaction.dart';
 import 'package:spending_management_app/providers/currency_notifier.dart';
 
@@ -25,10 +27,10 @@ class _ReportPageState extends ConsumerState<ReportPage>
   bool _isLoading = true;
 
   // New chart data variables
-  List<Map<String, dynamic>> _expenseMonthlyData = [];
-  List<Map<String, dynamic>> _incomeMonthlyData = [];
-  List<Map<String, dynamic>> _expensePieData = [];
-  List<Map<String, dynamic>> _incomePieData = [];
+  List<MonthlySpending> _expenseMonthlyData = [];
+  List<MonthlySpending> _incomeMonthlyData = [];
+  List<CategorySpending> _expensePieData = [];
+  List<CategorySpending> _incomePieData = [];
 
   @override
   void initState() {
@@ -89,35 +91,50 @@ class _ReportPageState extends ConsumerState<ReportPage>
   }
 
   // Helper method to create line chart
-  Widget _buildLineChart(List<Map<String, dynamic>> monthlyData) {
+  Widget _buildLineChart(List<MonthlySpending> monthlyData) {
     // Convert monthly data to line chart points
     final List<FlSpot> chartPoints = monthlyData.asMap().entries.map((entry) {
       final index = entry.key;
       final data = entry.value;
-      return FlSpot(index.toDouble(), (data['total'] as num).toDouble());
+      return FlSpot(index.toDouble(), data.amount);
     }).toList();
 
     return AspectRatio(
-      aspectRatio: 1.5,
+      aspectRatio: 1,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: LineChart(
           LineChartData(
+            minY: 0,
             gridData: FlGridData(show: false),
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
+                  interval: 1,
+                  reservedSize: 32,
                   getTitlesWidget: (value, meta) {
                     if (value.toInt() < monthlyData.length) {
-                      return Text(monthlyData[value.toInt()]['month']);
+                      return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(monthlyData[value.toInt()].month,
+                              style: const TextStyle(fontSize: 12)));
                     }
                     return const Text('');
                   },
                 ),
               ),
               leftTitles: AxisTitles(
-                sideTitles: SideTitles(showTitles: true),
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: 500,
+                  getTitlesWidget: (value, meta) {
+                    return Text(
+                      value.toString(),
+                      style: const TextStyle(fontSize: 12),
+                    );
+                  },
+                ),
               ),
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
@@ -140,23 +157,23 @@ class _ReportPageState extends ConsumerState<ReportPage>
   }
 
   // Helper method to create pie chart
-  Widget _buildPieChart(List<Map<String, dynamic>> pieData) {
+  Widget _buildPieChart(List<CategorySpending> pieData) {
     // Calculate total for percentage
-    final total = pieData.fold(
-        0.0, (sum, item) => sum + (item['total'] as num).toDouble());
+    final total = pieData.fold(0.0, (sum, item) => sum + item.amount);
 
     return AspectRatio(
-      aspectRatio: 1.5,
+      aspectRatio: 1,
       child: PieChart(
         PieChartData(
           sections: pieData.map((item) {
-            final amount = (item['total'] as num).toDouble();
+            final amount = item.amount;
             final percentage = (amount / total) * 100;
             return PieChartSectionData(
-              color: _getColorForCategory(item['category']),
+              color: _getColorForCategory(item.categoryName),
               value: amount,
-              title: '${percentage.toStringAsFixed(1)}%',
-              radius: 100,
+              title: '${item.categoryName}\n${percentage.toStringAsFixed(1)}%',
+              titleStyle: const TextStyle(fontWeight: FontWeight.bold),
+              radius: 120,
             );
           }).toList(),
           centerSpaceRadius: 40,
@@ -253,7 +270,7 @@ class _ReportPageState extends ConsumerState<ReportPage>
                                   ],
                                 ),
                                 child: ListTile(
-                                  title: Text(category.name),
+                                  title: Text(category.categoryName),
                                   trailing: Text(
                                     ref.watch(formattedAmountProvider(
                                         category.amount)),
@@ -333,7 +350,7 @@ class _ReportPageState extends ConsumerState<ReportPage>
                                   ],
                                 ),
                                 child: ListTile(
-                                  title: Text(category.name),
+                                  title: Text(category.categoryName),
                                   trailing: Text(
                                     ref.watch(formattedAmountProvider(
                                         category.amount)),
